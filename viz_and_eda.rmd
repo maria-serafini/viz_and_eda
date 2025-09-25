@@ -142,3 +142,105 @@ weather_df |>
 
 ## Univariate plots 
 
+```{r}
+weather_df |> 
+  ggplot(aes(x = tmin)) +
+  geom_histogram(color = "white", fill = "red") # color is outside bounds, fill is inside 
+```
+
+```{r}
+weather_df |> 
+  ggplot(aes(x = tmin, color = name)) +
+  geom_histogram()
+
+weather_df |> 
+  ggplot(aes(x = tmin, fill = name)) +
+  geom_histogram() #gives overlapping histogram
+
+# add facet grid
+```
+
+how would I fix? facet
+
+```{r}
+weather_df |> 
+  ggplot(aes(x = tmin, fill = name)) +
+  geom_histogram() +
+  facet_grid(name ~ .)
+```
+
+density plot
+
+```{r}
+weather_df |> 
+  ggplot(aes(x = tmin, fill = name)) +
+  geom_density(alpha = 0.2)
+```
+
+boxplot
+
+```{r}
+weather_df |> 
+  ggplot(aes(x = name, y = tmin)) +
+  geom_boxplot(aes(fill = name))
+```
+
+violin plots
+
+```{r}
+weather_df |> 
+  ggplot(aes(x = name, y = tmin, fill = name)) +
+  geom_violin()
+```
+
+ridge plot
+
+```{r}
+weather_df |> 
+  ggplot(aes(x = tmin, y = name)) +
+  geom_density_ridges()
+```
+
+LA univariate plots: Make plots that compare precipitation across locations. Try a histogram, a density plot, a boxplot, a violin plot, and a ridgeplot; use aesthetic mappings to make your figure readable
+
+```{r}
+# density plot
+weather_df |> 
+  ggplot(aes(x = prcp, fill = name)) +
+  geom_density(alpha = 0.2)
+
+# histogram
+weather_df |> 
+  ggplot(aes(x = prcp, fill = name)) +
+  geom_histogram() +
+  facet_grid(name ~ .)
+
+weather_df |> 
+  filter(prcp > 5, prcp < 1000) |> # zooms in on data by filtering out observations, want to be sure to explain this is zoomed in and does not represent the entrie dataset 
+  ggplot(aes(x = prcp, fill = name)) +
+  geom_density(alpha = 0.2) 
+```
+
+
+## Saving and embedding
+
+saving plots
+
+```{r}
+ggp_weather_violin = 
+  weather_df |> 
+  ggplot(aes(x = name, y = tmin, fill = name)) +
+  geom_violin()
+
+ggp_weather_violin
+
+ggsave("plots/violin_plot.pdf", ggp_weather_violin, # if plot is not saved in environment, will just pull last things you sent to viewer
+       width = 8, height = 6) # width and heigh in inches
+```
+
+embedding plots 
+
+```{r, fig.width = 6, fig.height =  4}
+ggp_weather_violin
+```
+

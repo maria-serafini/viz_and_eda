@@ -233,3 +233,193 @@ weather_df |>
 ![](viz_and_eda_files/figure-gfm/unnamed-chunk-13-1.png)<!-- -->
 
 ## Univariate plots
+
+``` r
+weather_df |> 
+  ggplot(aes(x = tmin)) +
+  geom_histogram(color = "white", fill = "red") # color is outside bounds, fill is inside 
+```
+
+    ## `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.
+
+    ## Warning: Removed 17 rows containing non-finite outside the scale range
+    ## (`stat_bin()`).
+
+![](viz_and_eda_files/figure-gfm/unnamed-chunk-14-1.png)<!-- -->
+
+``` r
+weather_df |> 
+  ggplot(aes(x = tmin, color = name)) +
+  geom_histogram()
+```
+
+    ## `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.
+
+    ## Warning: Removed 17 rows containing non-finite outside the scale range
+    ## (`stat_bin()`).
+
+![](viz_and_eda_files/figure-gfm/unnamed-chunk-15-1.png)<!-- -->
+
+``` r
+weather_df |> 
+  ggplot(aes(x = tmin, fill = name)) +
+  geom_histogram() #gives overlapping histogram
+```
+
+    ## `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.
+
+    ## Warning: Removed 17 rows containing non-finite outside the scale range
+    ## (`stat_bin()`).
+
+![](viz_and_eda_files/figure-gfm/unnamed-chunk-15-2.png)<!-- -->
+
+``` r
+# add facet grid
+```
+
+how would I fix? facet
+
+``` r
+weather_df |> 
+  ggplot(aes(x = tmin, fill = name)) +
+  geom_histogram() +
+  facet_grid(name ~ .)
+```
+
+    ## `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.
+
+    ## Warning: Removed 17 rows containing non-finite outside the scale range
+    ## (`stat_bin()`).
+
+![](viz_and_eda_files/figure-gfm/unnamed-chunk-16-1.png)<!-- -->
+
+density plot
+
+``` r
+weather_df |> 
+  ggplot(aes(x = tmin, fill = name)) +
+  geom_density(alpha = 0.2)
+```
+
+    ## Warning: Removed 17 rows containing non-finite outside the scale range
+    ## (`stat_density()`).
+
+![](viz_and_eda_files/figure-gfm/unnamed-chunk-17-1.png)<!-- -->
+
+boxplot
+
+``` r
+weather_df |> 
+  ggplot(aes(x = name, y = tmin)) +
+  geom_boxplot(aes(fill = name))
+```
+
+    ## Warning: Removed 17 rows containing non-finite outside the scale range
+    ## (`stat_boxplot()`).
+
+![](viz_and_eda_files/figure-gfm/unnamed-chunk-18-1.png)<!-- -->
+
+violin plots
+
+``` r
+weather_df |> 
+  ggplot(aes(x = name, y = tmin, fill = name)) +
+  geom_violin()
+```
+
+    ## Warning: Removed 17 rows containing non-finite outside the scale range
+    ## (`stat_ydensity()`).
+
+![](viz_and_eda_files/figure-gfm/unnamed-chunk-19-1.png)<!-- -->
+
+ridge plot
+
+``` r
+weather_df |> 
+  ggplot(aes(x = tmin, y = name)) +
+  geom_density_ridges()
+```
+
+    ## Picking joint bandwidth of 1.41
+
+    ## Warning: Removed 17 rows containing non-finite outside the scale range
+    ## (`stat_density_ridges()`).
+
+![](viz_and_eda_files/figure-gfm/unnamed-chunk-20-1.png)<!-- -->
+
+LA univariate plots: Make plots that compare precipitation across
+locations. Try a histogram, a density plot, a boxplot, a violin plot,
+and a ridgeplot; use aesthetic mappings to make your figure readable
+
+``` r
+# density plot
+weather_df |> 
+  ggplot(aes(x = prcp, fill = name)) +
+  geom_density(alpha = 0.2)
+```
+
+    ## Warning: Removed 15 rows containing non-finite outside the scale range
+    ## (`stat_density()`).
+
+![](viz_and_eda_files/figure-gfm/unnamed-chunk-21-1.png)<!-- -->
+
+``` r
+# histogram
+weather_df |> 
+  ggplot(aes(x = prcp, fill = name)) +
+  geom_histogram() +
+  facet_grid(name ~ .)
+```
+
+    ## `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.
+
+    ## Warning: Removed 15 rows containing non-finite outside the scale range
+    ## (`stat_bin()`).
+
+![](viz_and_eda_files/figure-gfm/unnamed-chunk-21-2.png)<!-- -->
+
+``` r
+weather_df |> 
+  filter(prcp > 5, prcp < 1000) |> # zooms in on data by filtering out observations, want to be sure to explain this is zoomed in and does not represent the entrie dataset 
+  ggplot(aes(x = prcp, fill = name)) +
+  geom_density(alpha = 0.2) 
+```
+
+![](viz_and_eda_files/figure-gfm/unnamed-chunk-21-3.png)<!-- -->
+
+## Saving and embedding
+
+saving plots
+
+``` r
+ggp_weather_violin = 
+  weather_df |> 
+  ggplot(aes(x = name, y = tmin, fill = name)) +
+  geom_violin()
+
+ggp_weather_violin
+```
+
+    ## Warning: Removed 17 rows containing non-finite outside the scale range
+    ## (`stat_ydensity()`).
+
+![](viz_and_eda_files/figure-gfm/unnamed-chunk-22-1.png)<!-- -->
+
+``` r
+ggsave("plots/violin_plot.pdf", ggp_weather_violin, # if plot is not saved in environment, will just pull last things you sent to viewer
+       width = 8, height = 6) # width and heigh in inches
+```
+
+    ## Warning: Removed 17 rows containing non-finite outside the scale range
+    ## (`stat_ydensity()`).
+
+embedding plots
+
+``` r
+ggp_weather_violin
+```
+
+    ## Warning: Removed 17 rows containing non-finite outside the scale range
+    ## (`stat_ydensity()`).
+
+![](viz_and_eda_files/figure-gfm/unnamed-chunk-23-1.png)<!-- -->
