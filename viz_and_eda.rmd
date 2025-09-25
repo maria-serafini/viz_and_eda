@@ -1,0 +1,52 @@
+---
+title: "Viz I"
+output: github_document
+---
+
+```{r setup, include=FALSE}
+library(tidyverse)
+library(ggridges)
+library(p8105.datasets)
+```
+
+Import weather data 
+
+```{r}
+data("weather_df")
+```
+
+First plot
+
+```{r}
+#ggplot(data = weather_df, mapping = aes(x = tmin, y = tmax)) + #aes - asthetic, what variables from data you want mapped onto canvas, don't normally see this, see below
+  #geom_point()
+
+ggplot(weather_df, aes(x = tmin, y = tmax)) + # more typical code
+  geom_point()
+```
+
+
+```{r}
+weather_df |> 
+  ggplot(aes(x = tmin, y = tmax)) +
+  geom_point() #same as code in  chunk above, stylistic choice
+```
+
+
+```{r}
+ggp_weather_scatterplot = #when saved in environment, still ggplot object, can add layers
+  weather_df |> 
+  ggplot(aes(x = tmin, y = tmax)) +
+  geom_point() 
+
+ggp_weather_scatterplot 
+
+```
+
+
+Check that some rows are missing
+
+```{r}
+
+```
+
