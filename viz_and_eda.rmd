@@ -47,6 +47,98 @@ ggp_weather_scatterplot
 Check that some rows are missing
 
 ```{r}
+weather_df |> # producing summary information about missingness is very important
+  filter(is.na(tmax))
+
+#nanier:: (package - missingess across all columns)
+```
+
+
+## Fancier scatterplots!
+
+```{r}
+weather_df |> 
+  ggplot(aes(x = tmin, y = tmax, color = name)) + # color = name, assigns color to each name
+  geom_point(alpha = 0.3) + # alpha aes, not in aes b/c it is not mapped, 1 = solid, 0 = see through
+  geom_smooth(se = FALSE) # adds smooth line, se = FALSE removes error band around lines, not reliable so remove
+```
+
+Where you define aesthetics can matter 
+
+```{r}
+weather_df |> 
+  ggplot(aes(x = tmin, y = tmax)) + 
+  geom_point(aes(color = name, size = prcp), alpha = 0.3, size = 0.3) + # if you do this, mapping is not inherited, size = 0.3 size of points, size = prcp variable name, will size points based on variable 
+  geom_smooth(se = FALSE)
+```
+
+using faceting real quick
+
+```{r}
+weather_df |> 
+  ggplot(aes(x = tmin, y = tmax)) + 
+  geom_point(aes(color = name, size = prcp), alpha = 0.3, size = 0.3) + 
+  geom_smooth(se = FALSE) +
+  facet_grid(. ~ name) # `. ~ name` splits into three columns - cols equal one subgroup/value, `name ~ .` = rows equal one subgroup/value
+```
+
+More interesting scatterplot
+
+```{r}
+weather_df |> 
+  ggplot(aes(x = tmin, y = tmax, color = name, shape = name)) + # shape = name, maps shape to name, gives different share for each category
+  geom_point(aes(size = prcp), alpha = 0.3) +
+  geom_smooth(se = FALSE) +
+  facet_grid(. ~ name)
+```
+
+# Learning Assessment: Write a code chain that starts with weather_df; focuses only on Central Park, converts temperatures to Fahrenheit, makes a scatterplot of min vs. max temperature, and overlays a linear regression line (using options in geom_smooth())
+
+LA plot:
+
+```{r}
+weather_df |> 
+  filter(name == "CentralPark_NY") |> 
+  mutate(
+    tmax_fahr = tmax * (9/5) + 32, 
+    tmin_fahr = tmin * (9/5) + 32
+  ) |> 
+  ggplot(aes(x = tmin_fahr, y = tmax_fahr)) +
+  geom_point() +
+  geom_smooth(se = FALSE, method = "lm") # method = "lm", fits linear regression
 
 ```
+
+
+## Small things 
+
+```{r}
+weather_df |> 
+  ggplot(aes(x = tmin, y = tmax, color = name, shape = name)) + 
+  #geom_point(alpha = 0.3) + 
+  geom_smooth(se = FALSE)
+
+weather_df |> 
+  ggplot(aes(x = tmin, y = tmax, color = name, shape = name)) + 
+  geom_smooth(se = FALSE) +
+  geom_point() # added in layers so adding points after smooth makes smooth difficult to see, 
+  
+```
+
+
+```{r}
+weather_df |> 
+  ggplot(aes(x = tmin, y = tmax)) +
+  geom_hex() # separatess x y plane into hexes and shows density of data 
+```
+
+
+```{r}
+weather_df |> 
+  ggplot(aes(x = tmin, y = tmax)) +
+  geom_point(color = "purple") # adding color outside of aes to geom point, can also use any color expressable as html hashcode 
+```
+
+
+## Univariate plots 
 
