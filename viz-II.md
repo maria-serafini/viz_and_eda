@@ -187,3 +187,130 @@ ggp_temp_season <-
     ## (`geom_point()`).
 
 ![](viz-II_files/figure-gfm/unnamed-chunk-7-1.png)<!-- -->
+
+## Data manipulation
+
+Let’s make temperature violin plots
+
+``` r
+weather_df |> 
+  mutate(name = fct_relevel(name, c("Molokai_HI", "CentralPark_NY", "Waterhole_WA"))) |> # releveling factor variable, giving variables these levels, telling specific order it should be in e.g. Molokai = 1, CentralPark = 2, Waterhole = 3
+  ggplot(aes(x = name, y = tmax, fill = name)) +
+  geom_violin(alpha = 0.5)
+```
+
+    ## Warning: Removed 17 rows containing non-finite outside the scale range
+    ## (`stat_ydensity()`).
+
+![](viz-II_files/figure-gfm/unnamed-chunk-8-1.png)<!-- -->
+
+``` r
+weather_df |> 
+  mutate(name = fct_reorder(name, tmax)) |> # tell which variable you are reordering and tell it which thing you are reordering with respect to 
+  ggplot(aes(x = name, y = tmax, fill = name)) +
+  geom_violin(alpha = 0.5)
+```
+
+    ## Warning: There was 1 warning in `mutate()`.
+    ## ℹ In argument: `name = fct_reorder(name, tmax)`.
+    ## Caused by warning:
+    ## ! `fct_reorder()` removing 17 missing values.
+    ## ℹ Use `.na_rm = TRUE` to silence this message.
+    ## ℹ Use `.na_rm = FALSE` to preserve NAs.
+
+    ## Warning: Removed 17 rows containing non-finite outside the scale range
+    ## (`stat_ydensity()`).
+
+![](viz-II_files/figure-gfm/unnamed-chunk-9-1.png)<!-- -->
+
+What about data tidiness??
+
+``` r
+pulse_df <-
+  haven::read_sas("data/public_pulse_data.sas7bdat") |> 
+  janitor::clean_names() |> 
+  pivot_longer(
+    bdi_score_bl:bdi_score_12m, 
+    names_to = "visit",
+    names_prefix = "bdi_score_",
+    values_to = "bdi"
+  ) |> 
+  mutate(visit = fct_inorder(visit)) # orders in order it appears in original dataset 
+
+pulse_df |> 
+  ggplot(aes(x = visit, y = bdi)) +
+  geom_boxplot()
+```
+
+    ## Warning: Removed 879 rows containing non-finite outside the scale range
+    ## (`stat_boxplot()`).
+
+![](viz-II_files/figure-gfm/unnamed-chunk-10-1.png)<!-- -->
+
+Make a plot for the FAS study
+
+``` r
+pups_df <-
+  read_csv("data/FAS_pups.csv", na = c("NA", ".", ""), skip = 3) |> 
+  janitor::clean_names() |> 
+  mutate(
+    sex = case_match(
+      sex, 
+      1 ~ "male", 
+      2 ~ "female"
+    )
+  )
+```
+
+    ## Rows: 313 Columns: 6
+    ## ── Column specification ────────────────────────────────────────────────────────
+    ## Delimiter: ","
+    ## chr (1): Litter Number
+    ## dbl (5): Sex, PD ears, PD eyes, PD pivot, PD walk
+    ## 
+    ## ℹ Use `spec()` to retrieve the full column specification for this data.
+    ## ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
+
+``` r
+litters_df <-
+  read_csv("data/FAS_litters.csv", na = c("NA", ".", "")) |> 
+  janitor::clean_names() |> 
+  separate(group, into = c("dose", "tx_day"), sep = 3)
+```
+
+    ## Rows: 49 Columns: 8
+    ## ── Column specification ────────────────────────────────────────────────────────
+    ## Delimiter: ","
+    ## chr (2): Group, Litter Number
+    ## dbl (6): GD0 weight, GD18 weight, GD of Birth, Pups born alive, Pups dead @ ...
+    ## 
+    ## ℹ Use `spec()` to retrieve the full column specification for this data.
+    ## ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
+
+``` r
+fas_df <-
+  left_join(pups_df, litters_df, by = "litter_number")
+
+
+fas_df |> 
+  select(pd_ears:tx_day) |> 
+  pivot_longer(
+    pd_ears:pd_walk, 
+    names_to = "outcome", 
+    names_prefix = "pd_", 
+    values_to = "pn_day") |> 
+  mutate(outcome = fct_reorder(outcome, pn_day)) |> 
+  drop_na() |> 
+  ggplot(aes(x = dose, y = pn_day)) +
+  geom_violin() +
+  facet_grid(tx_day ~ outcome)
+```
+
+    ## Warning: There was 1 warning in `mutate()`.
+    ## ℹ In argument: `outcome = fct_reorder(outcome, pn_day)`.
+    ## Caused by warning:
+    ## ! `fct_reorder()` removing 44 missing values.
+    ## ℹ Use `.na_rm = TRUE` to silence this message.
+    ## ℹ Use `.na_rm = FALSE` to preserve NAs.
+
+![](viz-II_files/figure-gfm/unnamed-chunk-11-1.png)<!-- -->
