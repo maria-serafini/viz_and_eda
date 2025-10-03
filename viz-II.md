@@ -126,3 +126,24 @@ ggplot_temp +
     ## (`geom_point()`).
 
 ![](viz-II_files/figure-gfm/unnamed-chunk-5-1.png)<!-- -->
+
+## Adding data in geoms
+
+``` r
+central_park_df <-
+  weather_df |> 
+  filter(name == "CentralPark_NY")
+
+molokai_df <-
+  weather_df |> 
+  filter(name == "Molokai_HI")
+
+ggplot(data = molokai_df, aes(x = date, y = tmax, color = name)) +
+  geom_point() +
+  geom_line(data = central_park_df) # use different datasets for different parts of plot 
+```
+
+    ## Warning: Removed 1 row containing missing values or values outside the scale range
+    ## (`geom_point()`).
+
+![](viz-II_files/figure-gfm/unnamed-chunk-6-1.png)<!-- -->
