@@ -126,8 +126,7 @@ weather_df |>
     mean_tmax = mean(tmax, na.rm = TRUE), # mean tmax for each month
     median_tmin = median(tmin, na.rm = TRUE),
     sd_prcp = sd(prcp, na.rm = TRUE)
-  ) |> 
-  view()
+  )
 ```
 
 
@@ -154,6 +153,103 @@ weather_df |>
   pivot_wider(
     names_from = name, 
     values_from = mean_tmax
+  ) |> 
+  knitr::kable(digits = 2)
+```
+
+
+## mutate with groups
+
+```{r}
+weather_df |> 
+  mutate(
+    mean_tmax = mean(tmax, na.rm = TRUE) # the mean_tmax is going to take all the tmax observations and compute mean for each of them, but doing so across all weather stations at all times
+  )
+```
+
+
+```{r}
+weather_df |> 
+  group_by(name) |> 
+  mutate(
+    mean_tmax = mean(tmax, na.rm = TRUE),
+    center_tmax = tmax - mean_tmax
+  ) |> 
+  ggplot(aes(x = date, y = center_tmax, color = name)) +
+  geom_point()
+```
+
+
+Look for cold days
+
+```{r}
+weather_df |> 
+  group_by(name, month) |> 
+  mutate(temp_rank = min_rank(desc(tmin))) |> 
+  filter(temp_rank < 2)
+```
+
+
+What about lags?
+
+```{r}
+weather_df |> 
+  group_by(name) |> # using grpup keeps track of observations by group 
+  mutate(lagged_tmax = lag(tmax)) # order matters here!
+```
+
+
+Use the variables you create
+
+```{r}
+weather_df |> 
+  group_by(name) |> 
+  mutate(
+    temp_change = tmax - lag(tmax)
+  ) |> 
+  summarize(
+    sd_tmax_change = sd(temp_change, na.rm = TRUE), 
+    tmax_change_max = max(temp_change, na.rm = TRUE)
+  )
+```
+
+
+```{r}
+weather_df |> 
+  group_by(name) |> 
+  mutate(
+    temp_change = tmax - lag(tmax), 
+    change_rank = min_rank(desc(temp_change))
+  ) |> 
+  filter(
+    change_rank < 2
+  )
+```
+
+
+## Revisit pulse
+
+```{r}
+pulse_df <-
+  haven::read_sas("data/public_pulse_data.sas7bdat") |> 
+  janitor::clean_names() |> 
+  pivot_longer(
+    bdi_score_bl:bdi_score_12m, 
+    names_to = "visit",
+    names_prefix = "bdi_score_",
+    values_to = "bdi"
+  ) |> 
+  mutate(visit = fct_inorder(visit))
+
+pulse_df |> 
+  ggplot(aes(x = visit, y = bdi)) +
+  geom_boxplot()
+
+pulse_df |> 
+  group_by(visit) |> 
+  summarize(
+    mean_bdi = mean(bdi, na.rm = TRUE),
+    median_bdi = median(bdi, na.rm = TRUE)
   ) |> 
   knitr::kable(digits = 2)
 ```
